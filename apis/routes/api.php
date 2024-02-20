@@ -15,10 +15,21 @@ use App\Http\Controllers\UsersController;
 */
 
 Route::post('register', [UsersController::class, 'register']);
-Route::post('login', [UsersController::class, 'login']);
-Route::get('/test',function(){
-    dd('called');
-});
-Route::group(['middleware' => 'auth.jwt'], function () {
-    //Route::post('logout', [UsersController::class, 'logout']);
+// Route::post('login', [UsersController::class, 'login']);
+
+// Route::group(['middleware' => 'auth.jwt'], function () {
+//     //Route::post('logout', [UsersController::class, 'logout']);
+// });
+Route::group([
+
+    'middleware' => 'api',
+    'namespace' => 'App\Http\Controllers'
+
+], function ($router) {
+
+    Route::post('login', 'UsersController@login');
+    Route::post('logout', 'UsersController@logout');
+    Route::post('refresh', 'UsersController@refresh');
+    Route::post('me', 'UsersController@me');
+
 });

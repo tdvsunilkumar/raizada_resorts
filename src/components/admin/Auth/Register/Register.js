@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import Layout from "../Layout/Layout";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Modal, Button, Form } from "react-bootstrap";
 import { displayNotification } from "../../../../utlts/admin/functions";
+import { register } from "../../Users/UserAPI";
 
 const Register = () => {
     const [show, setShow] = useState(false);
     const [validated, setValidated] = useState(false);
     const termsConditions = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,\n when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
+    const navigate = useNavigate();
 
     const handleShow = () => {
         setShow(true);
@@ -25,11 +27,19 @@ const Register = () => {
         if (form.checkValidity() === true) {
             const pasw = event.target.password.value;
             const confirmPsw = event.target.confirm_password.value;
-            console.log(pasw+' '+confirmPsw);
             if(pasw !== confirmPsw){
                 displayNotification('Password Does not match!','error');
             }else{
-                alert('Go ahead');
+                const formData = {
+                  'name'     : event.target.name.value,
+                  'email'    : event.target.email.value,
+                  'mobile'   : event.target.mobile.value,
+                  'address'  : event.target.address.value, 
+                  'password' : event.target.password.value,
+                  'role'     : 2 
+                };
+                register(formData,navigate);
+                
             }
 
         }
@@ -70,6 +80,29 @@ const Register = () => {
       name="email"
       ></Form.Control>
       <Form.Control.Feedback className="invalid-feedback" type="invalid">Email is invalid!</Form.Control.Feedback>
+    </div>
+
+    <div className="col-12">
+      <label htmlFor="email" className="form-label">Your Mobile</label>
+      <Form.Control 
+      required
+      className="form-control" 
+      type="text" 
+      pattern="[789][0-9]{9}"
+      name="mobile"
+      ></Form.Control>
+      <Form.Control.Feedback className="invalid-feedback" type="invalid">Mobile is invalid!</Form.Control.Feedback>
+    </div>
+
+    <div className="col-12">
+      <label htmlFor="email" className="form-label">Your Address</label>
+      <Form.Control 
+      required
+      className="form-control" 
+      type="text" 
+      name="address"
+      ></Form.Control>
+      <Form.Control.Feedback className="invalid-feedback" type="invalid">Address is invalid!</Form.Control.Feedback>
     </div>
 
     <div className="col-12">

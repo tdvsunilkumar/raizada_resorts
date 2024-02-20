@@ -1,8 +1,37 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Layout from "../Layout/Layout";
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import { Button, Form } from "react-bootstrap";
+import { useState } from "react";
+import { login } from "../../Users/UserAPI";
+import { Navigate } from "react-router-dom";
+import { checkEitherLoggedInorNot } from "../../../../utlts/admin/functions";
 const Login = () => {
+  
+  const navigate = useNavigate();
+  const [validated, setValidated] = useState(false);
+
+  const isLogged = localStorage.getItem('access-token');
+ 
+
+  const handleLogin = (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+        
+        if (form.checkValidity() === true) {
+            const formData = {
+              'email'    : event.target.email.value,
+              'password' : event.target.password.value,
+            };
+            login(formData,navigate);
+
+        }
+        setValidated(true);
+
+
+  }
+
+
     return(
         <Layout> 
             <div className="card mb-3">
@@ -14,31 +43,43 @@ const Login = () => {
     <p className="text-center small">Enter your username & password to login</p>
   </div>
 
-  <form className="row g-3 needs-validation" noValidate>
+    <Form className="row g-3 needs-validation" validated={validated} onSubmit={handleLogin}>
 
     <div className="col-12">
-      <label htmlFor="yourUsername" className="form-label">Username</label>
+      <label htmlFor="yourUsername" className="form-label">Email Address</label>
       <div className="input-group has-validation">
-        <span className="input-group-text" id="inputGroupPrepend">@</span>
-        <input type="text" name="username" className="form-control" id="yourUsername" required />
-        <div className="invalid-feedback">Please enter your username.</div>
+        <Form.Control
+        required
+        type="email" 
+        name="email" 
+        defaultValue='admin@admin.com'
+        className="form-control"
+        ></Form.Control>
+        <Form.Control.Feedback type="invalid">Email is invalid!</Form.Control.Feedback>
       </div>
     </div>
 
     <div className="col-12">
       <label htmlFor="yourPassword" className="form-label">Password</label>
-      <input type="password" name="password" className="form-control" id="yourPassword" required />
-      <div className="invalid-feedback">Please enter your password!</div>
+      <Form.Control
+        required
+        type="password" 
+        name="password" 
+        defaultValue="123456"
+        className="form-control"
+        ></Form.Control>
+        <Form.Control.Feedback type="invalid">Password is invalid!</Form.Control.Feedback>
     </div>
 
-    <div className="col-12">
+    {/* <div className="col-12">
       <div className="form-check">
         <input className="form-check-input" type="checkbox" name="remember" value="true" id="rememberMe" />
         <label className="form-check-label" htmlFor="rememberMe">Remember me</label>
       </div>
-    </div>
+    </div> */}
     <div className="col-12">
-      <button className="btn btn-primary w-100" type="submit">Login</button>
+      
+      <Button type="submit" className="btn btn-primary w-100">Login</Button>
     </div>
     <div className="col-12">
       <p className="small mb-0">Don't have account? <Link to='/admin/register'>click here</Link></p>
@@ -46,7 +87,7 @@ const Login = () => {
     <div className="col-12">
       <p className="small mb-0">Forgot Password? <Link to='/admin/forgot-password'>click here</Link></p>
     </div>
-  </form>
+    </Form>
 
 </div>
 </div>
