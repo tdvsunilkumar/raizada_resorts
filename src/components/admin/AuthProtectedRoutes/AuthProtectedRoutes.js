@@ -4,9 +4,37 @@ import { Navigate, Outlet, Route } from "react-router-dom";
 import { Component, useEffect, useState } from "react";
 
 const AuthProtectedRoutes = ({Component}) => {
-    checkEitherLoggedInorNot();
+  const [token, setToken] = useState();
+  const [isLoadingForCHeckValidity, setIsLoadingForCHeckValidity] = useState(false);
+
+  const checkTokenValidity = async () => {
+   if(localStorage.getItem('access-token') != ''){
+    await checkEitherLoggedInorNot(); 
+    setTimeout(()=>{
+      setIsLoadingForCHeckValidity(true);
+   },2000);
+   }else{
+    setIsLoadingForCHeckValidity(true);
+   }
+   
+  }
+      
+   useEffect(()=>{
+    checkTokenValidity().then(()=>{
+    });
+  },[]);
+  
+  
+  if(isLoadingForCHeckValidity){
     const isLogged = localStorage.getItem('access-token');
-      return (isLogged != '') ? <Component /> : <Navigate to="/admin/login" />;
+    return (isLogged != '') ? <Component /> : <Navigate to="/admin/login" />;
+  }
+    
+  
+  
+
+    
+    
     
 }
 

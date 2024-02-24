@@ -1,6 +1,7 @@
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import axios from "axios";
 import { enviourment } from "../../components/admin/enviourment/enviourment";
+import { useState } from "react";
 export function displayNotification(msg, msgType=''){
     if(msgType == 'info'){
         toast.info(msg, {
@@ -90,9 +91,10 @@ export function errorHandler(error, toastStatus) {
     };
   }
 
-  export function checkEitherLoggedInorNot(){
+  export async  function checkEitherLoggedInorNot(){
     const token = localStorage.getItem('access-token');
-    try {
+    //var data = {};
+     try {
       axios({
           method : 'post',
           headers: {
@@ -104,20 +106,23 @@ export function errorHandler(error, toastStatus) {
       }).then(function(response){
           if(response.data.status == 'success'){
             localStorage.setItem("isLogged", true);
+            localStorage.setItem("userDetails", JSON.stringify(response.data.userData));
           }else{
             localStorage.setItem("isLogged", false);
             localStorage.setItem("access-token", '');
+            localStorage.setItem("userDetails", {});
           }
 
       }).catch(function(error){
         localStorage.setItem("isLogged", false);
         localStorage.setItem("access-token", '');
+        localStorage.setItem("userDetails", {});
       });
       
   } catch (error) {
     localStorage.setItem("isLogged", false);
     localStorage.setItem("access-token", '');
-      
+    localStorage.setItem("userDetails", {});
   }
   }
   

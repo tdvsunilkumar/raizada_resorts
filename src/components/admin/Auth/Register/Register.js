@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../Layout/Layout";
 import { Link, useNavigate } from "react-router-dom";
 import { Modal, Button, Form } from "react-bootstrap";
 import { displayNotification } from "../../../../utlts/admin/functions";
 import { register } from "../../Users/UserAPI";
+import { useLoadder } from "../../Context/LoaderContext";
 
 const Register = () => {
     const [show, setShow] = useState(false);
     const [validated, setValidated] = useState(false);
+    const {loading, setLoading} = useLoadder();
     const termsConditions = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,\n when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
     const navigate = useNavigate();
 
@@ -19,7 +21,7 @@ const Register = () => {
         setShow(false);
     }
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         
         const form = event.currentTarget;
@@ -38,7 +40,11 @@ const Register = () => {
                   'password' : event.target.password.value,
                   'role'     : 2 
                 };
-                register(formData,navigate);
+                setLoading(true);
+                register(formData,navigate).then((response)=>{
+                  console.log(response);
+                });
+                setLoading(false);
                 
             }
 
@@ -47,6 +53,11 @@ const Register = () => {
 
        
     }
+
+    useEffect(()=>{
+      setLoading(false);
+
+    },[]);
 
     return(
        <Layout>

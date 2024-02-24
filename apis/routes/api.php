@@ -31,5 +31,8 @@ Route::group([
     Route::post('logout', 'UsersController@logout');
     Route::post('refresh', 'UsersController@refresh');
     Route::post('me', 'UsersController@me');
+    Route::post('send-password-email', 'UsersController@sendPasswordResetEmail');
+    Route::post('verify-change-password-token', 'UsersController@verifyChangePasswordToken');
+    Route::post('forgot-psw/change-psw', 'UsersController@changePswForForgotPaswword');
 
 });

@@ -6,15 +6,16 @@ import { useState } from "react";
 import { login } from "../../Users/UserAPI";
 import { Navigate } from "react-router-dom";
 import { checkEitherLoggedInorNot } from "../../../../utlts/admin/functions";
+import { useLoadder } from "../../Context/LoaderContext";
+
 const Login = () => {
-  
   const navigate = useNavigate();
   const [validated, setValidated] = useState(false);
-
+  const {loading, setLoading} = useLoadder();
   const isLogged = localStorage.getItem('access-token');
  
 
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
         
@@ -23,13 +24,24 @@ const Login = () => {
               'email'    : event.target.email.value,
               'password' : event.target.password.value,
             };
-            login(formData,navigate);
+            setLoading(true);
+            await login(formData,navigate);
+            
 
         }
         setValidated(true);
 
 
   }
+
+  useEffect(()=>{
+    console.log(document.readyState);
+    if(document.readyState === "complete"){
+      setLoading(false);
+    }
+    setLoading(false);
+
+  },[]);
 
 
     return(
