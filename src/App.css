@@ -49,3 +49,11 @@
   align-items: center;
   z-index: 999; /* Ensure the overlay is above other content */
 }
+
+.reactEasyCrop_Contain{
+  position: relative !important;
+}
+.reactEasyCrop_Container{
+  position: relative !important;
+
+}

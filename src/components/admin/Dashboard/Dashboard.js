@@ -9,8 +9,6 @@ const Dashboard = () => {
    const {loading, setLoading} = useLoadder();
 
     useEffect(()=>{
-       
-        
         if(document.readyState === "complete"){
             setLoading(false);
         }

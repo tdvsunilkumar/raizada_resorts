@@ -82,6 +82,40 @@ export function errorHandler(error, toastStatus) {
       };
     }
   }
+
+  export function generateUniqueStringWithDateTime(){
+    var today = new Date();
+    const year = today.getFullYear().toString();
+    const moneth = today.getMonth() + 1;
+    const day    = today.getDate();
+    const h      = today.getHours();
+    const min    = today.getMinutes();
+    const seco   = today.getSeconds();
+    const miliSec = today.getMilliseconds();
+    return year+moneth+day+h+min+seco+miliSec;
+
+  }
+
+  export async function getCroppedImg(imageSrc, crop) {
+    const canvas = document.createElement('canvas');
+    const scaleX = imageSrc.naturalWidth / imageSrc.width;
+    const scaleY = imageSrc.naturalHeight / imageSrc.height;
+    canvas.width = crop.width;
+    canvas.height = crop.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(
+      imageSrc,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      crop.width,
+      crop.height
+    );
+    return canvas.toDataURL('image/jpeg');
+  }
   
   export function successHandler(data) {
     displayNotification(data.message,'success');
@@ -95,7 +129,7 @@ export function errorHandler(error, toastStatus) {
     const token = localStorage.getItem('access-token');
     //var data = {};
      try {
-      axios({
+      return axios({
           method : 'post',
           headers: {
               Accept: "application/json",

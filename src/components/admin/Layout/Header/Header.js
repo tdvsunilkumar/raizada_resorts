@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { checkEitherLoggedInorNot } from "../../../../utlts/admin/functions";
 import { logout } from "../../Users/UserAPI";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useLoadder } from "../../Context/LoaderContext";
 const Header = () =>{
   const {loading, setLoading} = useLoadder();
@@ -216,10 +216,11 @@ useEffect(()=>{
                   </li>
       
                   <li>
-                    <a className="dropdown-item d-flex align-items-center" href="users-profile.html">
+                    <Link className="dropdown-item d-flex align-items-center" to="/admin/user-profile">
+                   
                       <i className="bi bi-gear"></i>
                       <span>Account Settings</span>
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <hr className="dropdown-divider" />

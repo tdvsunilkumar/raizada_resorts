@@ -26,7 +26,7 @@ const Login = () => {
             };
             setLoading(true);
             await login(formData,navigate);
-            
+            setLoading(false);
 
         }
         setValidated(true);

@@ -23,17 +23,8 @@ import { CSSProperties } from 'react';
 import { LoaderProvider } from './components/admin/Context/LoaderContext';
 import { useLoadder } from './components/admin/Context/LoaderContext';
 import ChangePassword from './components/admin/Auth/ChangePassword/ChangePassword';
-
-const override: CSSProperties = {
-  //display: "block",
-  //width:"100%",
-  borderColor: "#4154f1",
-  position: "absolute",
-  left:"50%",
-  top:"50%",
-  zIndex : "9999",
-  backgroundColor: "rgba(255,255,255,0.7)"
-};
+import Profile from './components/admin/Users/Profile/Profile';
+import Test from './components/admin/Test/Test';
 
 function App() {
   const isLogged = localStorage.getItem('access-token');
@@ -69,7 +60,9 @@ function App() {
      <Route path='/admin/register' element={(isLogged != '')?<Navigate to='/admin/dashboard' />:<Register />}></Route>
      <Route path='/admin/forgot-password' element={(isLogged != '')?<Navigate to='/admin/dashboard' />:<ForgotPassword />} ></Route>
      <Route path="/admin/dashboard" element={<AuthProtectedRoutes Component={Dashboard} />} />
+     <Route path="/admin/user-profile" element={<AuthProtectedRoutes Component={Profile} />} />
      <Route path='*' element={<NotFound />}></Route>
+     <Route path='/test' element={<Test />}></Route>
     </Routes>
     </BrowserRouter>
     </LoaderProvider>
