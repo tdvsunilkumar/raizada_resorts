@@ -1,54 +1,68 @@
 import React, { useRef, useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { displayNotification, generateUniqueStringWithDateTime } from "../../../../../utlts/admin/functions";
-import loadImage from "blueimp-load-image";
 import Cropper from 'react-easy-crop';
 import { getCroppedImg } from "../../../../../utlts/admin/functions";
+import { updateProfilePicture } from "../../UserAPI";
+import { useLoadder } from "../../../Context/LoaderContext";
+import { useNavigate } from "react-router-dom";
 
-const UpdateProfilePic = ({show, handleHide, handleShow}) => {
-    const preciewRef = useRef();
-    const cropRef = useRef();
-    const [image, setImage] = useState(null); 
+const UpdateProfilePic = ({show, handleHide, handleShow,displayEditProfileData}) => {
+    
+    const navigate = useNavigate();
+    const {loading, setLoading, getTesingData} = useLoadder();
     const [imageSrc, setimageSrc] = useState(null); 
-    const [imageObj, setimageObj] = useState({});
-
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+    const [image, setImage] = useState('');
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
 
     const cropSize = { width: 500, height: 600 };
 
     const onCropComplete = (croppedArea, croppedAreaPixels) => {
-    //console.log(croppedArea, croppedAreaPixels)
+      setCroppedAreaPixels(croppedAreaPixels);
   }
 
     const previewImage = (event) => {
-           setImage(event.target.value);
-           loadImage(event.target.files[0], { noRevoke:true }).then(function (data) {
-            setimageSrc(data.image.src);
-            setimageObj(event.target.files[0]);
-          })
-        
-
+      if(event.target.files && event.target.files.length > 0){
+        const reader = new FileReader();
+        reader.readAsDataURL(event.target.files[0]);
+        reader.addEventListener('load',()=>{
+          setimageSrc(reader.result);
+          setImage(event.target.value);
+        });
+      }
     }
 
     const handleSubmit = async () => {
         if(image == ''){
             displayNotification('No image selected!','error')
         }else{
+            setLoading(true);
             try {
-                const userProfilePcName = generateUniqueStringWithDateTime();
-                alert(userProfilePcName);
-                const croppedImage = await getCroppedImg(imageObj, crop, userProfilePcName+'.jpeg'); // Call utility function to get cropped image
-                console.log('Cropped image:', croppedImage);
-          
-                // Upload cropped image to server using fetch or Axios
-                // Example: await uploadImageToServer(croppedImage);
+                const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels); // Call utility function to get cropped image
+                await updateProfilePicture(croppedImage,'pic').then((response)=>{
+                  setLoading(false);
+                  if(response.data.status == 'success'){
+                    displayNotification(response.data.message,'success');
+                    handleHide();
+                    displayEditProfileData();
+  
+                  }if(response.data.status == 'error'){
+                    displayNotification(response.data.message,'error');
+                  }
+
+                }).catch((error)=>{
+                  setLoading(false);
+                  displayNotification(error.message, error,'error');
+
+                });
               } catch (error) {
-                console.error('Error saving image:', error);
+                setLoading(false);
+                displayNotification('Error saving image:', error,'error');
               }
         }
     }
-
     return (
         <>
         <Modal 

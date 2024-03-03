@@ -8,10 +8,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Panoscape\History\HasOperations;
+use Panoscape\History\HasHistories;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasOperations, HasHistories;
 
     /**
      * The attributes that are mass assignable.
@@ -22,6 +24,21 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'mobile',
+        'address',
+        'city_state',
+        'profile_image',
+        'about_me',
+        'company_name',
+        'designation',
+        'twitter_profile',
+        'facebook_profile',
+        'instagram_profile',
+        'linkedin_profile',
+        'status',
+        'email_verified_at',
+        'role',
+        'remember_token'
     ];
 
     /**
@@ -56,5 +73,10 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function getModelLabel()
+    {
+        return $this->display_name;
     }
 }

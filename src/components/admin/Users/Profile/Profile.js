@@ -1,24 +1,45 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useLoadder } from "../../Context/LoaderContext";
 import Main from "../../Layout/Main/Main";
 import EditProfile from "./EditProfile/EditProfile";
 import ProfileOverView from "./ProfileOverView/ProfileOverView";
 import ChangePassword from "./ChangePassword/ChangePassword";
+import { enviourment } from "../../enviourment/enviourment";
+import { ProfileProvider } from "./ProfileContext";
+import { useProfile } from "./ProfileContext";
+import ProfileSidePart from "./ProfileSidePart/ProfileSidePart";
+import { Link } from "react-router-dom";
 
 const Profile = () =>{
+    const {profileData, getProfileData} = useProfile();
     const {loading, setLoading} = useLoadder();
+    const [tab, setTab] = useState(1);
+
+    const handleTab = (id) =>{
+      setTab(id);
+    }
+
+    const loadProfileData = async() => {
+      setLoading(true);
+      //await getProfileData();
+      setLoading(false);
+
+    }
 
     useEffect(()=>{
+        loadProfileData();
         setLoading(false);
     },[]);
 
     return (
+    
         <Main>
+          <ProfileProvider>
              <div className="pagetitle">
       <h1>Profile</h1>
       <nav>
         <ol className="breadcrumb">
-          <li className="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li className="breadcrumb-item"><Link to="/admin/dashboard">Home</Link></li>
           <li className="breadcrumb-item">Users</li>
           <li className="breadcrumb-item active">Profile</li>
         </ol>
@@ -27,24 +48,7 @@ const Profile = () =>{
 
     <section className="section profile">
       <div className="row">
-        <div className="col-xl-4">
-
-          <div className="card">
-            <div className="card-body profile-card pt-4 d-flex flex-column align-items-center">
-
-              <img src="assets/img/profile-img.jpg" alt="Profile" className="rounded-circle" />
-              <h2>Kevin Anderson</h2>
-              <h3>Web Designer</h3>
-              <div className="social-links mt-2">
-                <a href="#" className="twitter"><i className="bi bi-twitter"></i></a>
-                <a href="#" className="facebook"><i className="bi bi-facebook"></i></a>
-                <a href="#" className="instagram"><i className="bi bi-instagram"></i></a>
-                <a href="#" className="linkedin"><i className="bi bi-linkedin"></i></a>
-              </div>
-            </div>
-          </div>
-
-        </div>
+        <ProfileSidePart />
 
         <div className="col-xl-8">
 
@@ -54,25 +58,22 @@ const Profile = () =>{
               <ul className="nav nav-tabs nav-tabs-bordered">
 
                 <li className="nav-item">
-                  <button className="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">Overview</button>
+                  <button className="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview" onClick={()=>handleTab('1')}>Overview</button>
                 </li>
 
                 <li className="nav-item">
-                  <button className="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Profile</button>
+                  <button className="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit" onClick={()=>handleTab('2')}>Edit Profile</button>
                 </li>
 
                 <li className="nav-item">
-                  <button className="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password">Change Password</button>
+                  <button className="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password" onClick={()=>handleTab('3')} >Change Password</button>
                 </li>
 
               </ul>
               <div className="tab-content pt-2">
-
-                <ProfileOverView />
-
-                <EditProfile />
-
-                <ChangePassword />
+                {tab == 1 && <ProfileOverView random={Math.random()} />}
+                {tab == 2 && <EditProfile  />}
+                {tab == 3 && <ChangePassword  />}
 
               </div>
 
@@ -82,7 +83,7 @@ const Profile = () =>{
         </div>
       </div>
     </section>
-
+    </ProfileProvider>
         </Main>
         
     );

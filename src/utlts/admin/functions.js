@@ -1,7 +1,7 @@
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import axios from "axios";
 import { enviourment } from "../../components/admin/enviourment/enviourment";
-import { useState } from "react";
+
 export function displayNotification(msg, msgType=''){
     if(msgType == 'info'){
         toast.info(msg, {
@@ -96,26 +96,68 @@ export function errorHandler(error, toastStatus) {
 
   }
 
-  export async function getCroppedImg(imageSrc, crop) {
+  export const createImage = (url) =>
+  new Promise((resolve, reject) => {
+    const image = new Image();
+    image.addEventListener("load", () => resolve(image));
+    image.addEventListener("error", (error) => reject(error));
+    image.setAttribute("crossOrigin", "anonymous"); 
+    image.src = url;
+  });
+
+  export function getRadianAngle(degreeValue) {
+    return (degreeValue * Math.PI) / 180;
+  }
+  
+  export function rotateSize(width, height, rotation) {
+    const rotRad = getRadianAngle(rotation);
+  
+    return {
+      width:
+        Math.abs(Math.cos(rotRad) * width) + Math.abs(Math.sin(rotRad) * height),
+      height:
+        Math.abs(Math.sin(rotRad) * width) + Math.abs(Math.cos(rotRad) * height),
+    };
+  }
+  
+
+  export async function getCroppedImg(
+    imageSrc,
+    pixelCrop
+  ) {
+    const imageElement = document.createElement('img');
+    imageElement.src = imageSrc;
+    const scaleX = imageElement.naturalWidth / imageElement.width;
+    const scaleY = imageElement.naturalHeight / imageElement.height;
     const canvas = document.createElement('canvas');
-    const scaleX = imageSrc.naturalWidth / imageSrc.width;
-    const scaleY = imageSrc.naturalHeight / imageSrc.height;
-    canvas.width = crop.width;
-    canvas.height = crop.height;
+    canvas.width = pixelCrop.width;
+    canvas.height = pixelCrop.height;
     const ctx = canvas.getContext('2d');
     ctx.drawImage(
-      imageSrc,
-      crop.x * scaleX,
-      crop.y * scaleY,
-      crop.width * scaleX,
-      crop.height * scaleY,
+      imageElement,
+      pixelCrop.x * scaleX,
+      pixelCrop.y * scaleY,
+      pixelCrop.width * scaleX,
+      pixelCrop.height * scaleY,
       0,
       0,
-      crop.width,
-      crop.height
+      pixelCrop.width,
+      pixelCrop.height
     );
-    return canvas.toDataURL('image/jpeg');
+
+    return new Promise((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error('Failed to create blob'));
+          return;
+        }
+        resolve(blob);
+      }, 'image/jpeg');
+    });
+ 
   }
+
+ 
   
   export function successHandler(data) {
     displayNotification(data.message,'success');
@@ -159,4 +201,12 @@ export function errorHandler(error, toastStatus) {
     localStorage.setItem("userDetails", {});
   }
   }
+
+  export function getRandomNumber(min, max){
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  };
+
+ 
+
+
   

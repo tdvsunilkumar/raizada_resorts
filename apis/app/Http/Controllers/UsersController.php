@@ -10,6 +10,7 @@ use App\Models\User;
 use Str;
 use App\Mail\SendMail;
 use Mail;
+use Panoscape\History\Events\ModelChanged;
 
 class UsersController extends Controller
 {
@@ -56,12 +57,12 @@ class UsersController extends Controller
         ];
         try {
            DB::beginTransaction();
-           DB::table('users')->insert($dataToSave);
+           User::create($dataToSave);
            DB::commit();
            return response()->json(['status' => 'success','message' => 'User created successfully!']);
         } catch (\Exception $e) {
            DB::rollback();
-           return response()->json(['status' => 'success','message' => $e->getMessage()]);
+           return response()->json(['status' => 'error','message' => $e->getMessage()]);
         }
     }
 
@@ -72,6 +73,7 @@ class UsersController extends Controller
 
         if ($token = $this->guard()->attempt($credentials)) {
             $userDetails = DB::table('users')->where('id',Auth::user()->id)->first();
+            event(new ModelChanged(User::find($userDetails->id), $userDetails->name.' Logged In successfully!'));
             $response = [
                 'token' => $token,
                 'status' => 'success',
@@ -91,8 +93,8 @@ class UsersController extends Controller
 
     public function logout()
     {
+        event(new ModelChanged(User::find(Auth::user()->id), Auth::user()->name.' Logged out successfully!'));
         $this->guard()->logout();
-
         return response()->json(['status'=>'success','message' => 'Successfully logged out']);
     }
 
@@ -125,7 +127,9 @@ class UsersController extends Controller
         } else {
             // If email exists
             $token = $this->generateToken($request->email);
+            $user = DB::table('users')->where('email',$request->email)->first();
             $url = config('constants.website_url')."/change-password?token=".$token;
+            event(new ModelChanged(User::find($user->id),'Email sent to recover password'));
             try {
                 
                 $html = '<html>
@@ -139,6 +143,7 @@ class UsersController extends Controller
                     'status' => 'success',
                     'message' => 'Check your inbox, we have sent a link to reset email.'
                 ]);
+                
             } catch (\Exception $e) {
                 return response()->json([
                     'status' => 'error',
@@ -248,5 +253,93 @@ class UsersController extends Controller
         }
         
         
+    }
+
+    public function updateProfile(Request $request){
+        if($request->update == 'pic'){
+            $rules = [
+                'image'=>'mimes:jpeg,jpg,png|required',
+            ];
+        }if($request->update == 'data'){
+            $rules = [
+                'email'=>'required|unique:users,email,'.Auth::user()->id,
+                'mobile'=>'required|unique:users,mobile,'.Auth::user()->id
+            ];
+        }if($request->update == 'psw'){
+            $rules = [
+                'c_password' => 'required',
+                'password'=>'required|same:confirm_password',
+                'confirm_password'=>'required',
+            ];
+        }
+       
+        $validator = \Validator::make(
+            $request->all(), $rules,
+            [
+                'image.required' => 'Image is Required Field',
+                'image.mimes' => 'Only jpg, png images allowed to upload!',
+                'email.required' => 'Email is Required Field',
+                'mobile.required' => 'Mobile is Required Field',
+                'email.unique' => 'Email is already Exists',
+                'mobile.unique' => 'Mobile is already Exists',
+                'c_password.required' => 'Current Password is Required',
+                'password.required' => 'Current Password is Required',
+                'confirm_password.required' => 'Current Password is Required',
+                'password.same' => 'New password and Confirm password does not match'
+            ]
+        );
+        if($validator->fails()){
+            $messages = $validator->getMessageBag();
+            $arr['status'] = 'error';
+            $arr['message'] = $messages->all()[0];
+            return response()->json($arr);
+        }
+        if($request->update == 'psw'){
+            
+            if (!Hash::check($request->c_password, Auth::user()->password)) {
+                $arr['status'] = 'error';
+                $arr['message'] = 'Current password does not match!';
+                return response()->json($arr);
+               }
+
+        }
+
+        $dataToUpdate = [];
+        if($request->hasfile('image')){
+            $uploadedFile = $_FILES['image'];
+            $uploadDir = 'uploads/admin/profile_pic/';
+            $uploadedFilePath = $uploadDir . uniqid() . '.jpg'; // You may adjust file name or extension here
+            try {
+                if (move_uploaded_file($uploadedFile['tmp_name'], $uploadedFilePath)) {
+                    $dataToUpdate['profile_image'] = $uploadedFilePath;
+                }
+            } catch (\Exception $e) {
+                return response()->json(['status' => 'error','message' => $e->getMessage()]);
+            }
+        }
+        if($request->update == 'data'){
+            $dataToUpdate = $request->all();
+            unset($dataToUpdate['update']);
+        }
+        if($request->update == 'psw'){
+            $dataToUpdate = [
+                'password' => Hash::make($request->password)
+            ];
+        }
+
+        if(!empty($dataToUpdate)){
+            $dataToUpdate['updated_at'] = date("Y-m-d H:i:s");
+            
+            try {
+                User::find(Auth::user()->id)->update($dataToUpdate);
+                return response()->json(['status' => 'success','message' => 'Data updated successfully!']);
+            } catch (\Exception $e) {
+                return response()->json(['status' => 'error','message' => $e->getMessage()]);
+            }
+        }else{
+            return response()->json(['status' => 'success','message' => 'Data updated successfully!']);
+
+        }
+
     }
 }

@@ -67,7 +67,7 @@ export const login = async (data,navigate) => {
 export const logout = async (navigate) => {
     const token = localStorage.getItem('access-token');
     try {
-        axios({
+       return axios({
             method: 'post',
             headers: {
                 Accept: "application/json",
@@ -163,3 +163,53 @@ export const changePswForGotPassword =  async (data,navigate) => {
     
 
 }
+
+export const updateProfilePicture =   async (blob,updateType) => {
+     const token = localStorage.getItem('access-token');
+     const formData = new FormData();
+     formData.append('croppedImage', blob);
+     return axios({
+       method: 'post',
+       headers: {
+         'content-type': 'multipart/form-data',
+           "Authorization" :  `Bearer ${token}`
+         },
+         url: enviourment.UPDATE_PROFILE,
+         data : {image:blob,'update':updateType}
+   });
+}
+
+export const updateProfileData =   async (formdata) => {
+    const token = localStorage.getItem('access-token');
+    return axios({
+      method: 'post',
+      headers: {
+        Accept: "application/json",
+                "Content-Type": "application/json;charset=UTF-8",
+                "Authorization" :  `Bearer ${token}`
+        },
+        url: enviourment.UPDATE_PROFILE,
+        data : formdata
+  }).then(function(response){
+    if(response.data.status == 'success'){
+        successHandler(response.data);
+    }if(response.data.status == 'error'){
+        errorHandler(response.data,true);
+    }
+    }).catch(function(error){
+        errorHandler(error,true);
+    });
+}
+
+export async function getProfileDataAPI(){
+    const token = localStorage.getItem('access-token');
+      return axios({
+          method : 'post',
+          headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json;charset=UTF-8",
+              "Authorization" :  `Bearer ${token}`
+            },
+            url: enviourment.CHECK_LOGGEDIN,
+      })
+  }

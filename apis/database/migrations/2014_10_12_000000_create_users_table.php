@@ -20,6 +20,15 @@ class CreateUsersTable extends Migration
             $table->string('mobile')->unique();
             $table->text('address')->nullable();
             $table->text('city_state')->nullable();
+            $table->string('profile_image')->nullable();
+            $table->text('about_me')->nullable();
+            $table->string('company_name')->nullable();
+            $table->string('designation')->nullable();
+            $table->string('twitter_profile')->nullable();
+            $table->string('facebook_profile')->nullable();
+            $table->string('instagram_profile')->nullable();
+            $table->string('linkedin_profile')->nullable();
+            $table->integer('status')->default('1')->comment('0=>Inactive,1=>Active,2=>temporary blocked');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('role');

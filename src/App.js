@@ -24,7 +24,8 @@ import { LoaderProvider } from './components/admin/Context/LoaderContext';
 import { useLoadder } from './components/admin/Context/LoaderContext';
 import ChangePassword from './components/admin/Auth/ChangePassword/ChangePassword';
 import Profile from './components/admin/Users/Profile/Profile';
-import Test from './components/admin/Test/Test';
+import Settings from './components/admin/Settings/Settings';
+import Sections from './components/admin/Sections/Sections';
 
 function App() {
   const isLogged = localStorage.getItem('access-token');
@@ -61,8 +62,10 @@ function App() {
      <Route path='/admin/forgot-password' element={(isLogged != '')?<Navigate to='/admin/dashboard' />:<ForgotPassword />} ></Route>
      <Route path="/admin/dashboard" element={<AuthProtectedRoutes Component={Dashboard} />} />
      <Route path="/admin/user-profile" element={<AuthProtectedRoutes Component={Profile} />} />
+     <Route path="/admin/settings" element={<AuthProtectedRoutes Component={Settings} />} />
+     <Route path="/admin/sections" element={<AuthProtectedRoutes Component={Sections} />} />
      <Route path='*' element={<NotFound />}></Route>
-     <Route path='/test' element={<Test />}></Route>
+   
     </Routes>
     </BrowserRouter>
     </LoaderProvider>

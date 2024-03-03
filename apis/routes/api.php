@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
+use App\Http\Controllers\admin\SettingsController;
+use App\Http\Controllers\SectionsController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -34,5 +36,12 @@ Route::group([
     Route::post('send-password-email', 'UsersController@sendPasswordResetEmail');
     Route::post('verify-change-password-token', 'UsersController@verifyChangePasswordToken');
     Route::post('forgot-psw/change-psw', 'UsersController@changePswForForgotPaswword');
+    Route::post('account/update-profile', 'UsersController@updateProfile');
+    Route::post('settings/update-settings', 'admin\SettingsController@updateSettings');
+    Route::get('settings/load-settings', 'admin\SettingsController@getSettings');
+    Route::post('section/add-update-section', 'SectionsController@addUpdateSection');
+    Route::get('section/getlist', 'SectionsController@getList');
+    Route::get('section/getsection/{id}', 'SectionsController@getSectionDetails');
+    Route::post('section/deletesection', 'SectionsController@deleteSection');
 
 });

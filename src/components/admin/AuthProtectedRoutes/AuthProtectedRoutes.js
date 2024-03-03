@@ -8,12 +8,13 @@ const AuthProtectedRoutes = ({Component}) => {
   const [isLoadingForCHeckValidity, setIsLoadingForCHeckValidity] = useState(false);
 
   const checkTokenValidity = async () => {
-   if(localStorage.getItem('access-token') != ''){
+
     await checkEitherLoggedInorNot(); 
     setIsLoadingForCHeckValidity(true);
-   }else{
-    setIsLoadingForCHeckValidity(true);
-   }
+  
+  //  }else{
+  //   setIsLoadingForCHeckValidity(true);
+  //  }
    
   }
       
